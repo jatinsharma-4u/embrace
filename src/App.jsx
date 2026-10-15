@@ -1,78 +1,77 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
-import { AnimatePresence, MotionConfig } from 'framer-motion'
+import { MotionConfig } from 'framer-motion'
 import { initSmoothScroll, scrollToTop, scrollToEl, ScrollTrigger } from './lib/motion'
 import Header from './components/Header'
 import BottomNav from './components/BottomNav'
 import CartDrawer from './components/CartDrawer'
 import SearchOverlay from './components/SearchOverlay'
 import Toast from './components/Toast'
-import Loader from './components/Loader'
 import Home from './pages/Home'
 
-const Shop = lazy(() => import('./pages/Shop'))
-const Product = lazy(() => import('./pages/Product'))
-const Collections = lazy(() => import('./pages/Collections'))
-const Maison = lazy(() => import('./pages/Maison'))
-const Contact = lazy(() => import('./pages/Contact'))
-const Wishlist = lazy(() => import('./pages/Wishlist'))
-const NotFound = lazy(() => import('./pages/NotFound'))
-const Checkout = lazy(() => import('./pages/Checkout'))
+const routes = {
+  shop: () => import('./pages/Shop'),
+  product: () => import('./pages/Product'),
+  collections: () => import('./pages/Collections'),
+  maison: () => import('./pages/Maison'),
+  contact: () => import('./pages/Contact'),
+  wishlist: () => import('./pages/Wishlist'),
+  checkout: () => import('./pages/Checkout'),
+  notFound: () => import('./pages/NotFound'),
+}
+const Shop = lazy(routes.shop)
+const Product = lazy(routes.product)
+const Collections = lazy(routes.collections)
+const Maison = lazy(routes.maison)
+const Contact = lazy(routes.contact)
+const Wishlist = lazy(routes.wishlist)
+const Checkout = lazy(routes.checkout)
+const NotFound = lazy(routes.notFound)
 
 export default function App() {
   const location = useLocation()
-  const [booted, setBooted] = useState(false)
 
   useEffect(() => {
     initSmoothScroll()
+    // Fetch every route chunk while idle so page switches are instant
+    const idle = window.requestIdleCallback ?? ((cb) => setTimeout(cb, 600))
+    idle(() => Object.values(routes).forEach((load) => load()))
   }, [])
 
-  // Warm up route chunks once the first paint is done
-  useEffect(() => {
-    if (!booted) return
-    const id = setTimeout(() => {
-      import('./pages/Shop')
-      import('./pages/Product')
-      import('./pages/Collections')
-    }, 1200)
-    return () => clearTimeout(id)
-  }, [booted])
-
-  const onExitComplete = () => {
-    scrollToTop(true)
-    requestAnimationFrame(() => {
-      ScrollTrigger.refresh()
-      if (location.hash) {
-        setTimeout(() => scrollToEl(document.querySelector(location.hash)), 450)
-      }
-    })
-    const main = document.getElementById('main')
-    main?.focus({ preventScroll: true })
-  }
+  // Instant route change: jump to top (or to the #hash target) before paint
+  useLayoutEffect(() => {
+    if (location.hash) {
+      setTimeout(() => scrollToEl(document.querySelector(location.hash)), 120)
+    } else {
+      scrollToTop(true)
+    }
+    const t = setTimeout(() => ScrollTrigger.refresh(), 150)
+    document.getElementById('main')?.focus({ preventScroll: true })
+    return () => clearTimeout(t)
+  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isProduct = location.pathname.startsWith('/product/')
   const isCheckout = location.pathname === '/checkout'
 
   return (
     <MotionConfig reducedMotion="user">
-      <a href="#main" className="skip-link">Skip to content</a>
-      <Loader onDone={() => setBooted(true)} />
-      <Header booted={booted} />
-      <main id="main" tabIndex={-1} className={isProduct ? 'has-sticky-cta' : ''}>
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
+      <Header booted />
+      <main id="main" tabIndex={-1}>
         <Suspense fallback={<div className="route-fallback" aria-hidden="true" />}>
-          <AnimatePresence mode="wait" onExitComplete={onExitComplete}>
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Home booted={booted} />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/product/:slug" element={<Product />} />
-              <Route path="/collections" element={<Collections />} />
-              <Route path="/maison" element={<Maison />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AnimatePresence>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home booted />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/product/:slug" element={<Product />} />
+            <Route path="/collections" element={<Collections />} />
+            <Route path="/maison" element={<Maison />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </Suspense>
       </main>
       <BottomNav hidden={isProduct || isCheckout} />

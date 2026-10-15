@@ -50,8 +50,9 @@
   max-width: 1480px;
   margin-inline: auto;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
-  gap: 16px 10px;
+  /* phones/tablets: [necklace] [title] [flexible space] [CTA] */
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  gap: 10px;
   padding: calc(var(--header-h) + 8px) var(--gutter) calc(var(--bottom-nav-h) + 26px + var(--safe-b));
 }
 
@@ -106,13 +107,13 @@
      visibly continues off-screen: the necklace hangs from above instead of floating. */
   --lift: calc(var(--header-h) + 8px + 16px);
   grid-column: 1 / -1;
-  grid-row: 1 / 3;
+  grid-row: 1;
   position: relative;
   z-index: 2;
   min-height: 0;
   margin-top: calc(var(--lift) * -1);
-  /* the pear's narrow tip sits beside "Embrace"; its widest part overlaps the top of the wordmark */
-  margin-bottom: calc(var(--wm) * 0.3);
+  /* phones: sized from the width so the pendant stays proportionate on tall screens */
+  height: calc(var(--lift) + min(92vw, 50svh));
   pointer-events: none;
 }
 .hero__tilt {
@@ -218,7 +219,7 @@
 .hero__title {
   grid-column: 1 / -1;
   grid-row: 2;
-  align-self: end;
+  align-self: start;
   justify-self: center;
   position: relative;
   z-index: 1;
@@ -233,7 +234,7 @@
   margin-bottom: calc(var(--wm) * 0.02);
   font-family: var(--sans);
   font-weight: 300;
-  font-size: max(20px, calc(var(--wm) * 0.17));
+  font-size: max(18px, calc(var(--wm) * 0.17));
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: #fff;
@@ -276,7 +277,7 @@
 /* lead + CTAs */
 .hero__lead {
   grid-column: 1 / -1;
-  grid-row: 3;
+  grid-row: 4;
   display: grid;
   gap: 18px;
 }
@@ -365,7 +366,7 @@
 }
 .hero-card--bloom {
   grid-column: 1;
-  grid-row: 4;
+  grid-row: 5;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -406,7 +407,7 @@
 }
 .hero-card--community {
   grid-column: 2;
-  grid-row: 4;
+  grid-row: 5;
   display: flex;
   align-items: center;
   padding: 14px 0 0 16px;
@@ -467,13 +468,12 @@
 .hero__scroll {
   display: none;
 }
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .hero-card {
     display: none !important;
   }
   .hero__grid {
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    padding-bottom: calc(var(--bottom-nav-h) + 40px + var(--safe-b));
+    padding-bottom: calc(var(--bottom-nav-h) + 32px + var(--safe-b));
   }
 }
 @media (max-width: 1023px) {
@@ -502,7 +502,10 @@
 /* tablet 768–1023: same stack as mobile, roomier, description visible */
 @media (min-width: 768px) {
   .hero__frame {
-    --wm: min(22vw, 21svh);
+    --wm: min(20vw, 17svh);
+  }
+  .hero__jewel-wrap {
+    height: calc(var(--lift) + min(62vw, 40svh));
   }
   .hero__grid {
     gap: 22px 16px;
@@ -536,7 +539,11 @@
   }
   .hero__jewel-wrap {
     --lift: calc(var(--header-h) + 28px + 150px);
+    height: auto;
     margin-bottom: calc(var(--wm) * 0.34);
+  }
+  .hero__title {
+    align-self: end;
   }
   .hero__desc {
     font-size: 14px;
@@ -804,11 +811,11 @@
   flex: none;
   display: grid;
   place-items: center;
-  height: 40px;
-  min-width: 44px;
-  padding: 0 12px;
+  height: 36px;
+  min-width: 40px;
+  padding: 0 10px;
   border-radius: var(--r-pill);
-  border: 1px solid var(--em-800);
+  border: 1px solid rgba(11, 56, 38, 0.55);
   color: var(--em-800);
   background: transparent;
   overflow: hidden;
@@ -852,7 +859,7 @@
     gap: 10px;
   }
   .pcard__add {
-    padding: 0 16px;
+    padding: 0 14px;
   }
   .pcard__add-label {
     display: inline;

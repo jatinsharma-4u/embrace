@@ -75,7 +75,7 @@ export function StoreProvider({ children }) {
       dispatch({ type: 'add', line })
       const metalName = product.metals.find((m) => m.id === line.metal)?.name ?? ''
       const detail = [metalName, line.size, qty > 1 ? `Qty ${qty}` : null].filter(Boolean).join(' · ')
-      notify({ kind: 'cart', product, title: `${product.name} added`, text: detail })
+      notify({ kind: 'cart', product, title: 'Added to bag', text: product.name, sub: detail, duration: 3200 })
     },
     [notify]
   )

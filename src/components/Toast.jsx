@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useStore } from '../context/StoreContext'
 import { ease } from '../lib/motion'
-import Sparkle from './Sparkle'
-import { IconClose, IconHeart } from './Icons'
+import { IconCheck, IconClose, IconHeart } from './Icons'
 
+// Compact, light notification. Progress line shows how long it stays.
 export default function Toast() {
   const { toast, dismissToast, setCartOpen } = useStore()
   return (
@@ -13,30 +13,29 @@ export default function Toast() {
           <motion.div
             key={toast.id}
             className="toast"
-            initial={{ opacity: 0, y: 30, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.98, transition: { duration: 0.25 } }}
-            transition={{ duration: 0.5, ease }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8, transition: { duration: 0.18 } }}
+            transition={{ duration: 0.35, ease }}
             role="status"
           >
             {toast.product ? (
               <span className="toast__thumb">
                 <img src={toast.product.image} alt="" />
-                {toast.kind === 'cart' && <Sparkle size={56} loop={false} className="toast__sparkle" />}
-                {toast.kind === 'wish' && (
-                  <span className="toast__heart">
-                    <IconHeart />
-                  </span>
-                )}
               </span>
             ) : (
-              <span className="toast__thumb toast__thumb--plain">
-                <Sparkle size={40} />
+              <span className="toast__icon" aria-hidden="true">
+                <IconCheck />
               </span>
             )}
             <div className="toast__body">
-              <p className="toast__title">{toast.title}</p>
+              <p className="toast__title">
+                {toast.kind === 'cart' && <IconCheck className="toast__mark" />}
+                {toast.kind === 'wish' && <IconHeart className="toast__mark toast__mark--heart" />}
+                {toast.title}
+              </p>
               {toast.text && <p className="toast__text">{toast.text}</p>}
+              {toast.sub && <p className="toast__sub">{toast.sub}</p>}
             </div>
             {toast.kind === 'cart' && (
               <button
@@ -63,6 +62,13 @@ export default function Toast() {
             <button className="toast__close" onClick={dismissToast} aria-label="Dismiss notification">
               <IconClose />
             </button>
+            <motion.span
+              className="toast__timer"
+              aria-hidden="true"
+              initial={{ scaleX: 1 }}
+              animate={{ scaleX: 0 }}
+              transition={{ duration: (toast.duration ?? 4200) / 1000, ease: 'linear' }}
+            />
           </motion.div>
         )}
       </AnimatePresence>

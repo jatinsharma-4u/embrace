@@ -187,7 +187,7 @@ export default function Product() {
         <Gallery product={product} collection={collection} key={product.slug} />
 
         <div className="pdp__info">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.3 }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.05 }}>
             <Link to={`/shop?collection=${collection.slug}`} className="pdp__collection">
               {collection.name}
             </Link>
@@ -213,7 +213,7 @@ export default function Product() {
             <p className="pdp__desc">{product.description}</p>
           </motion.div>
 
-          <motion.div className="pdp__options" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.42 }}>
+          <motion.div className="pdp__options" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.12 }}>
             <fieldset className="opt">
               <legend>
                 Metal <span>{metalObj.name}</span>
